@@ -60,7 +60,6 @@ tr:hover td{background:#f8f9fa}
 #sigCanvas{display:block;touch-action:none;cursor:crosshair}
 .btn-clear{background:#fdecea;color:#c0392b;border:1px solid #f0c0bb;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;font-family:Arial,sans-serif;margin-top:8px}
 .success-card{background:#fff;border-radius:12px;border:2px solid #27ae60;padding:40px;text-align:center}
-/* מודל סיסמה */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center}
 .modal-box{background:#fff;border-radius:14px;padding:32px;width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25)}
 .modal-box h2{color:#1a5276;font-size:18px;margin-bottom:6px}
@@ -79,13 +78,11 @@ tr:hover td{background:#f8f9fa}
 </div>
 
 <div class="container">
-
   <div class="tab-btns">
     <button class="tab-btn active" id="btnForm" onclick="showTab('form')">טופס הרשמה</button>
     <button class="tab-btn" id="btnAdmin" onclick="tryAdmin()">פאנל ניהול 🔒</button>
   </div>
 
-  <!-- טופס הרשמה -->
   <div id="tabForm">
     <div class="progress-bar" id="progressBar">
       <div class="steps">
@@ -218,7 +215,7 @@ tr:hover td{background:#f8f9fa}
       </div>
       <div class="nav-btns">
         <button class="btn-back" onclick="goBack(6)">→ חזור</button>
-        <button class="btn-next" style="background:#27ae60" onclick="submitForm()">שלח הרשמה ✓</button>
+        <button class="btn-next" style="background:#27ae60" id="submitBtn" onclick="submitForm()">שלח הרשמה ✓</button>
       </div>
     </div>
 
@@ -232,7 +229,6 @@ tr:hover td{background:#f8f9fa}
     </div>
   </div>
 
-  <!-- פאנל ניהול -->
   <div id="tabAdmin" style="display:none">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -259,10 +255,8 @@ tr:hover td{background:#f8f9fa}
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- מודל סיסמה -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center">
   <div class="modal-box">
     <h2>🔒 פאנל ניהול</h2>
@@ -278,6 +272,7 @@ tr:hover td{background:#f8f9fa}
 </div>
 
 <script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzCcvk3dDTUHYIE3zN1SknChaITE121Q32zmX4Q0yUgY2CZk_41qQM1V0yKfN765I0f-Q/exec';
 const PW = 'avichi2025';
 let unlocked = false;
 let regs = [];
@@ -315,7 +310,8 @@ function bindCanvas() {
 
 function clearSig() { ctx.clearRect(0,0,canvas.width,canvas.height); hasSig=false; }
 
-/* סיסמה */
+function togglePw() { const i=document.getElementById('pwInput'); i.type=i.type==='password'?'text':'password'; }
+
 function tryAdmin() {
   if (unlocked) { showAdmin(); return; }
   document.getElementById('pwInput').value = '';
@@ -336,9 +332,7 @@ function checkPw() {
 }
 
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
-function togglePw() { const i=document.getElementById('pwInput'); i.type=i.type==='password'?'text':'password'; }
 
-/* טאבים */
 function showAdmin() {
   document.getElementById('tabForm').style.display = 'none';
   document.getElementById('tabAdmin').style.display = 'block';
@@ -356,7 +350,6 @@ function showTab(t) {
   }
 }
 
-/* ניווט */
 function updateProgress(s) {
   for (let i=1;i<=6;i++) {
     const el = document.getElementById('s'+i);
@@ -399,60 +392,112 @@ function addSib() {
 
 function removeSib(btn) { const c=document.getElementById('sibCont'); if(c.children.length>1) btn.closest('.sibling-row').remove(); }
 
-function resetForm() {
-  // איפוס כל השדות
-  document.querySelectorAll('#tabForm input, #tabForm select, #tabForm textarea').forEach(el => {
-    if (el.type === 'checkbox' || el.type === 'radio') el.checked = el.defaultChecked;
-    else el.value = el.defaultValue || '';
-  });
-  document.getElementById('sign_date').value = new Date().toISOString().split('T')[0];
-  clearSig();
-  // איפוס אחים — השאר רק שורה אחת
-  const sib = document.getElementById('sibCont');
-  while (sib.children.length > 1) sib.lastChild.remove();
-  sib.querySelectorAll('input').forEach(i => i.value = '');
-  // חזרה לשלב 1
-  for (let i = 1; i <= 6; i++) document.getElementById('step'+i).style.display = i===1 ? 'block' : 'none';
-  document.getElementById('stepSuccess').style.display = 'none';
-  document.getElementById('progressBar').style.display = 'block';
-  document.querySelector('.tab-btns').style.display = 'flex';
-  document.getElementById('diagNote').style.display = 'none';
-  document.getElementById('sigErr').style.display = 'none';
-  updateProgress(1);
-  window.scrollTo(0, 0);
-}
-
-function submitForm() {
+async function submitForm() {
   if (!validate(['signer_name'])) return;
   if (!hasSig) { document.getElementById('sigErr').style.display='block'; return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'שולח...';
+  btn.disabled = true;
+
+  const data = {
+    lastName: document.getElementById('last_name').value,
+    firstName: document.getElementById('first_name').value,
+    idNum: document.getElementById('id_num').value,
+    gender: document.getElementById('gender').value,
+    bdayEng: document.getElementById('bday_eng').value,
+    bdayHeb: document.getElementById('bday_heb').value,
+    birthplace: document.getElementById('birthplace').value,
+    aliyaDate: document.getElementById('aliya_date').value,
+    address: document.getElementById('address').value,
+    homePhone: document.getElementById('home_phone').value,
+    fatherName: document.getElementById('father_name').value,
+    fatherStatus: document.getElementById('father_status').value,
+    fatherJob: document.getElementById('father_job').value,
+    fatherWorkplace: document.getElementById('father_workplace').value,
+    fatherMobile: document.getElementById('father_mobile').value,
+    fatherWorkPhone: document.getElementById('father_work_phone').value,
+    fatherEmail: document.getElementById('father_email').value,
+    motherName: document.getElementById('mother_name').value,
+    motherStatus: document.getElementById('mother_status').value,
+    motherJob: document.getElementById('mother_job').value,
+    motherWorkplace: document.getElementById('mother_workplace').value,
+    motherMobile: document.getElementById('mother_mobile').value,
+    motherWorkPhone: document.getElementById('mother_work_phone').value,
+    motherEmail: document.getElementById('mother_email').value,
+    hmo: document.getElementById('hmo').value,
+    hmoBranch: document.getElementById('hmo_branch').value,
+    emergencyName: document.getElementById('emergency_name').value,
+    emergencyPhone: document.getElementById('emergency_phone').value,
+    emergencyRel: document.getElementById('emergency_rel').value,
+    diagnosis: document.querySelector('input[name="diag"]:checked').value === 'yes',
+    medicalNotes: document.getElementById('medical_notes').value,
+    friend1: document.getElementById('friend1').value,
+    friend2: document.getElementById('friend2').value,
+    friend3: document.getElementById('friend3').value,
+    prevSchool: document.getElementById('prev_school').value,
+    extraNotes: document.getElementById('extra_notes').value,
+    conWelfare: document.getElementById('con_welfare').checked,
+    conSchool: document.getElementById('con_school').checked,
+    conHmo: document.getElementById('con_hmo').checked,
+    conPsych: document.getElementById('con_psych').checked,
+    photoConsent: document.getElementById('photo_consent').checked,
+    signerName: document.getElementById('signer_name').value,
+  };
+
   regs.push({
     id: Date.now(),
-    firstName: document.getElementById('first_name').value,
-    lastName: document.getElementById('last_name').value,
-    bday: document.getElementById('bday_eng').value,
-    fatherName: document.getElementById('father_name').value,
-    motherName: document.getElementById('mother_name').value,
-    phone: document.getElementById('father_mobile').value || document.getElementById('mother_mobile').value,
-    diagnosis: document.querySelector('input[name="diag"]:checked').value==='yes',
-    status: 'pending'
+    firstName: data.firstName, lastName: data.lastName,
+    bday: data.bdayEng, fatherName: data.fatherName, motherName: data.motherName,
+    phone: data.fatherMobile || data.motherMobile,
+    diagnosis: data.diagnosis, status: 'pending'
   });
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.warn('שגיאה:', e); }
+
   document.getElementById('step6').style.display = 'none';
   document.getElementById('progressBar').style.display = 'none';
   document.getElementById('stepSuccess').style.display = 'block';
   document.querySelector('.tab-btns').style.display = 'none';
 }
 
-/* טבלה */
+function resetForm() {
+  document.querySelectorAll('#tabForm input, #tabForm select, #tabForm textarea').forEach(el => {
+    if (el.type==='checkbox'||el.type==='radio') el.checked=el.defaultChecked;
+    else el.value = el.defaultValue||'';
+  });
+  document.getElementById('sign_date').value = new Date().toISOString().split('T')[0];
+  clearSig();
+  const sib = document.getElementById('sibCont');
+  while (sib.children.length>1) sib.lastChild.remove();
+  sib.querySelectorAll('input').forEach(i=>i.value='');
+  for (let i=1;i<=6;i++) document.getElementById('step'+i).style.display=i===1?'block':'none';
+  document.getElementById('stepSuccess').style.display='none';
+  document.getElementById('progressBar').style.display='block';
+  document.querySelector('.tab-btns').style.display='flex';
+  document.getElementById('diagNote').style.display='none';
+  document.getElementById('sigErr').style.display='none';
+  document.getElementById('submitBtn').textContent='שלח הרשמה ✓';
+  document.getElementById('submitBtn').disabled=false;
+  updateProgress(1); window.scrollTo(0,0);
+}
+
 let _f='', _sf='';
 function renderTable() {
   const filtered = regs.filter(r => {
-    const n = (r.firstName+' '+r.lastName).toLowerCase();
-    return (!_f||n.includes(_f.toLowerCase())) && (!_sf||r.status===_sf);
+    const n=(r.firstName+' '+r.lastName).toLowerCase();
+    return (!_f||n.includes(_f.toLowerCase()))&&(!_sf||r.status===_sf);
   });
   document.getElementById('regCount').textContent = regs.length;
   const tb = document.getElementById('regBody');
   if (!filtered.length) { tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>'; return; }
-  tb.innerHTML = filtered.map((r,i) => `<tr>
+  tb.innerHTML = filtered.map((r,i)=>`<tr>
     <td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td>
     <td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td>
     <td dir="ltr">${r.phone||'—'}</td>
@@ -465,16 +510,16 @@ function renderTable() {
   </tr>`).join('');
 }
 
-function setSt(id,s) { const r=regs.find(r=>r.id===id); if(r) r.status=s; renderTable(); }
-function filterTable(v) { _f=v; renderTable(); }
-function filterStatus(v) { _sf=v; renderTable(); }
+function setSt(id,s){const r=regs.find(r=>r.id===id);if(r)r.status=s;renderTable();}
+function filterTable(v){_f=v;renderTable();}
+function filterStatus(v){_sf=v;renderTable();}
 
 function exportCSV() {
-  if (!regs.length) { alert('אין נרשמים לייצוא'); return; }
-  const h = ['שם משפחה','שם פרטי','ת. לידה','שם האב','שם האם','טלפון','אבחון','סטטוס'];
-  const rows = regs.map(r=>[r.lastName,r.firstName,r.bday,r.fatherName,r.motherName,r.phone,r.diagnosis?'כן':'לא',r.status]);
-  const csv = '\uFEFF'+[h,...rows].map(r=>r.join(',')).join('\n');
-  const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='רשימת_נרשמים.csv'; a.click();
+  if (!regs.length){alert('אין נרשמים לייצוא');return;}
+  const h=['שם משפחה','שם פרטי','ת. לידה','שם האב','שם האם','טלפון','אבחון','סטטוס'];
+  const rows=regs.map(r=>[r.lastName,r.firstName,r.bday,r.fatherName,r.motherName,r.phone,r.diagnosis?'כן':'לא',r.status]);
+  const csv='\uFEFF'+[h,...rows].map(r=>r.join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='רשימת_נרשמים.csv';a.click();
 }
 </script>
 </body>
