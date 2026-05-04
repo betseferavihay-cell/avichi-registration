@@ -29,10 +29,11 @@ label{font-size:13px;color:#555;font-weight:500}
 input,select,textarea{border:1px solid #ccc;border-radius:8px;padding:9px 11px;font-size:14px;font-family:Arial,sans-serif;width:100%;direction:rtl;transition:.2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#1a5276;box-shadow:0 0 0 3px rgba(26,82,118,.1)}
 textarea{resize:vertical;min-height:80px}
+input[type=file]{padding:6px;font-size:13px;cursor:pointer}
 .sibling-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
 .btn-add{background:#e8f0f8;color:#1a5276;border:1px dashed #1a5276;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;width:100%;margin-top:4px;font-family:Arial,sans-serif}
 .btn-remove{background:#fdecea;color:#c0392b;border:1px solid #f0c0bb;border-radius:6px;padding:8px 10px;cursor:pointer;font-size:13px;font-family:Arial,sans-serif}
-.radio-group{display:flex;gap:16px;padding-top:4px}
+.radio-group{display:flex;gap:16px;padding-top:4px;flex-wrap:wrap}
 .radio-group label{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-size:14px}
 .checkbox-group{display:flex;flex-direction:column;gap:8px}
 .checkbox-group label{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-weight:400;font-size:14px;line-height:1.5}
@@ -67,6 +68,7 @@ tr:hover td{background:#f8f9fa}
 .pw-row{position:relative;margin-bottom:12px}
 .pw-row input{text-align:center;letter-spacing:3px;font-size:16px;padding-left:38px}
 .pw-eye{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:0}
+.sub-section{background:#f8f9fa;border-radius:10px;padding:16px;margin-top:8px;grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -95,6 +97,7 @@ tr:hover td{background:#f8f9fa}
       </div>
     </div>
 
+    <!-- שלב 1 -->
     <div class="card" id="step1">
       <div class="section-title">פרטי התלמיד/ה</div>
       <div class="form-grid">
@@ -112,6 +115,7 @@ tr:hover td{background:#f8f9fa}
       <div class="nav-btns"><div></div><button class="btn-next" onclick="goNext(1)">הבא ←</button></div>
     </div>
 
+    <!-- שלב 2 -->
     <div class="card" id="step2" style="display:none">
       <div class="section-title">פרטי האב</div>
       <div class="form-grid">
@@ -136,6 +140,7 @@ tr:hover td{background:#f8f9fa}
       <div class="nav-btns"><button class="btn-back" onclick="goBack(2)">→ חזור</button><button class="btn-next" onclick="goNext(2)">הבא ←</button></div>
     </div>
 
+    <!-- שלב 3 -->
     <div class="card" id="step3" style="display:none">
       <div class="section-title">פרטי אחים</div>
       <div id="sibCont">
@@ -150,20 +155,93 @@ tr:hover td{background:#f8f9fa}
       <div class="nav-btns"><button class="btn-back" onclick="goBack(3)">→ חזור</button><button class="btn-next" onclick="goNext(3)">הבא ←</button></div>
     </div>
 
+    <!-- שלב 4 -->
     <div class="card" id="step4" style="display:none">
       <div class="section-title">מידע רפואי</div>
       <div class="form-grid">
-        <div class="form-group full"><label>האם קיים אבחון?</label>
+
+        <!-- זכאות חנ"מ -->
+        <div class="form-group full">
+          <label>האם קיימת לילד זכאות לשירותי חינוך מיוחד (חנ"מ)?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="special_ed" value="yes" onchange="toggleSpecialEd(true)"> כן</label>
+            <label><input type="radio" name="special_ed" value="no" onchange="toggleSpecialEd(false)" checked> לא</label>
+          </div>
+        </div>
+        <div id="specialEdSection" style="display:none;grid-column:1/-1">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>האם עבר/ה ועדת זכאות ואפיון / ועדת שילוב?</label>
+              <div class="radio-group">
+                <label><input type="radio" name="committee" value="afion" onchange="toggleAfion(true)"> ועדת אפיון וזכאות</label>
+                <label><input type="radio" name="committee" value="shiluv" onchange="toggleAfion(false)"> ועדת שילוב</label>
+                <label><input type="radio" name="committee" value="none" onchange="toggleAfion(false)" checked> לא עבר/ה</label>
+              </div>
+            </div>
+            <div class="form-group full" id="afionSection" style="display:none">
+              <label>מהו האפיון?</label>
+              <input type="text" id="afion_type" placeholder="פרטי האפיון">
+            </div>
+            <div class="form-group full" id="afionDiagFile" style="display:none">
+              <label>צירוף אבחון</label>
+              <input type="file" id="afion_diag_file" accept=".pdf,.jpg,.jpeg,.png">
+              <p class="field-note">יש לצרף אבחון בנוסף להחלטת הוועדה</p>
+            </div>
+            <div class="form-group full">
+              <label>צירוף החלטת הוועדה</label>
+              <input type="file" id="committee_file" accept=".pdf,.jpg,.jpeg,.png">
+              <p class="field-note">יש לצרף את החלטת הוועדה בכל מקרה (אפיון / שילוב)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- אבחון -->
+        <div class="form-group full">
+          <label>האם קיים אבחון?</label>
           <div class="radio-group">
             <label><input type="radio" name="diag" value="yes" onchange="toggleDiag(true)"> כן</label>
             <label><input type="radio" name="diag" value="no" onchange="toggleDiag(false)" checked> לא</label>
           </div>
         </div>
-        <div class="form-group full" id="diagNote" style="display:none"><label>פירוט האבחון</label><textarea></textarea></div>
-        <div class="form-group full"><label>פרטים על הילד/ה (רגישות, תרופות, בעיות רפואיות)</label><textarea id="medical_notes"></textarea></div>
+        <div class="form-group full" id="diagNote" style="display:none">
+          <label>צירוף האבחון</label>
+          <input type="file" id="diag_file" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <!-- מידע רפואי -->
+        <div class="form-group full"><label>פרטים על הילד/ה (רגישות למאכלים, תרופות, בעיות רפואיות)</label><textarea id="medical_notes"></textarea></div>
+
+        <!-- התמודדות רגשית -->
+        <div class="form-group full">
+          <label>התמודדות או אתגר רגשי/משפחתי שתרצו לשתף בו</label>
+          <p class="field-note">כדי שנוכל להכיר טוב יותר את בנכם/בתכם ולסייע להם — לא חובה</p>
+          <textarea id="emotional_notes" placeholder="שתפו אותנו במה שנראה לכם רלוונטי..."></textarea>
+        </div>
+
+        <!-- סיוע בגן -->
+        <div class="form-group full">
+          <label>האם בנכם/בתכם קיבלו סיוע לימודי או רגשי בגן?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="gan_support" value="yes" onchange="toggleGanSupport(true)"> כן</label>
+            <label><input type="radio" name="gan_support" value="no" onchange="toggleGanSupport(false)" checked> לא</label>
+          </div>
+        </div>
+        <div class="form-group full" id="ganSupportFile" style="display:none">
+          <label>צירוף מסמכים רלוונטיים</label>
+          <input type="file" id="gan_support_file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+        </div>
+
+        <!-- מסמכים נוספים -->
+        <div class="form-group full">
+          <label>מסמכים נוספים</label>
+          <p class="field-note">כל טופס או מסמך שיכול לסייע לנו להכיר טוב יותר את הילד/ה — לא חובה</p>
+          <input type="file" id="extra_docs" accept=".pdf,.jpg,.jpeg,.png" multiple>
+        </div>
+
         <div class="form-group"><label>קופת חולים <span class="req-star">*</span></label><select id="hmo"><option value="">-- בחר --</option><option>מכבי</option><option>כללית</option><option>מאוחדת</option><option>לאומית</option></select></div>
         <div class="form-group"><label>סניף</label><input type="text" id="hmo_branch"></div>
       </div>
+
       <div class="section-title" style="margin-top:24px">קשר לחירום</div>
       <div class="form-grid three">
         <div class="form-group"><label>שם <span class="req-star">*</span></label><input type="text" id="emergency_name"></div>
@@ -173,6 +251,7 @@ tr:hover td{background:#f8f9fa}
       <div class="nav-btns"><button class="btn-back" onclick="goBack(4)">→ חזור</button><button class="btn-next" onclick="goNext(4)">הבא ←</button></div>
     </div>
 
+    <!-- שלב 5 -->
     <div class="card" id="step5" style="display:none">
       <div class="section-title">בקשות והעדפות</div>
       <div class="form-grid">
@@ -186,6 +265,7 @@ tr:hover td{background:#f8f9fa}
       <div class="nav-btns"><button class="btn-back" onclick="goBack(5)">→ חזור</button><button class="btn-next" onclick="goNext(5)">הבא ←</button></div>
     </div>
 
+    <!-- שלב 6 -->
     <div class="card" id="step6" style="display:none">
       <div class="section-title">אישורים וויתור סודיות</div>
       <div style="background:#f8f9fa;border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px;line-height:1.7;color:#444">
@@ -229,6 +309,7 @@ tr:hover td{background:#f8f9fa}
     </div>
   </div>
 
+  <!-- פאנל ניהול -->
   <div id="tabAdmin" style="display:none">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -257,6 +338,7 @@ tr:hover td{background:#f8f9fa}
   </div>
 </div>
 
+<!-- מודל סיסמה -->
 <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center">
   <div class="modal-box">
     <h2>🔒 פאנל ניהול</h2>
@@ -274,12 +356,12 @@ tr:hover td{background:#f8f9fa}
 <script>
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzCcvk3dDTUHYIE3zN1SknChaITE121Q32zmX4Q0yUgY2CZk_41qQM1V0yKfN765I0f-Q/exec';
 const PW = 'avichi2025';
-let unlocked = false;
-let regs = [];
+let unlocked = false, regs = [];
 let drawing = false, hasSig = false;
 let canvas, ctx;
 
 window.onload = function() {
+  updateProgress(1);
   canvas = document.getElementById('sigCanvas');
   ctx = canvas.getContext('2d');
   canvas.width = canvas.parentElement.clientWidth || 600;
@@ -291,231 +373,140 @@ window.onload = function() {
 function bindCanvas() {
   const getPos = (e) => {
     const r = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / r.width;
-    const scaleY = canvas.height / r.height;
+    const scaleX = canvas.width / r.width, scaleY = canvas.height / r.height;
     const s = e.touches ? e.touches[0] : e;
     return { x: (s.clientX - r.left) * scaleX, y: (s.clientY - r.top) * scaleY };
   };
-  const startDraw = (e) => { e.preventDefault(); drawing=true; ctx.beginPath(); const p=getPos(e); ctx.moveTo(p.x,p.y); };
-  const moveDraw = (e) => { e.preventDefault(); if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#1a5276'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); hasSig=true; };
-  const stopDraw = () => drawing=false;
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', moveDraw);
-  canvas.addEventListener('mouseup', stopDraw);
-  canvas.addEventListener('mouseleave', stopDraw);
-  canvas.addEventListener('touchstart', startDraw, {passive:false});
-  canvas.addEventListener('touchmove', moveDraw, {passive:false});
-  canvas.addEventListener('touchend', stopDraw);
+  const start = (e) => { e.preventDefault(); drawing=true; ctx.beginPath(); const p=getPos(e); ctx.moveTo(p.x,p.y); };
+  const move = (e) => { e.preventDefault(); if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#1a5276'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); hasSig=true; };
+  const stop = () => drawing=false;
+  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',stop);
 }
 
 function clearSig() { ctx.clearRect(0,0,canvas.width,canvas.height); hasSig=false; }
-
 function togglePw() { const i=document.getElementById('pwInput'); i.type=i.type==='password'?'text':'password'; }
+function toggleSpecialEd(show) { document.getElementById('specialEdSection').style.display=show?'block':'none'; }
+function toggleAfion(show) { document.getElementById('afionSection').style.display=show?'block':'none'; document.getElementById('afionDiagFile').style.display=show?'block':'none'; }
+function toggleDiag(show) { document.getElementById('diagNote').style.display=show?'block':'none'; }
+function toggleGanSupport(show) { document.getElementById('ganSupportFile').style.display=show?'block':'none'; }
 
 function tryAdmin() {
   if (unlocked) { showAdmin(); return; }
-  document.getElementById('pwInput').value = '';
-  document.getElementById('pwErr').style.display = 'none';
-  document.getElementById('modal').style.display = 'flex';
-  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+  document.getElementById('pwInput').value=''; document.getElementById('pwErr').style.display='none';
+  document.getElementById('modal').style.display='flex';
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
 }
-
 function checkPw() {
-  if (document.getElementById('pwInput').value === PW) {
-    unlocked = true;
-    document.getElementById('modal').style.display = 'none';
-    showAdmin();
-  } else {
-    document.getElementById('pwErr').style.display = 'block';
-    document.getElementById('pwInput').value = '';
-  }
+  if (document.getElementById('pwInput').value===PW) { unlocked=true; document.getElementById('modal').style.display='none'; showAdmin(); }
+  else { document.getElementById('pwErr').style.display='block'; document.getElementById('pwInput').value=''; }
 }
-
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
+function closeModal() { document.getElementById('modal').style.display='none'; }
 function showAdmin() {
-  document.getElementById('tabForm').style.display = 'none';
-  document.getElementById('tabAdmin').style.display = 'block';
-  document.getElementById('btnForm').classList.remove('active');
-  document.getElementById('btnAdmin').classList.add('active');
+  document.getElementById('tabForm').style.display='none'; document.getElementById('tabAdmin').style.display='block';
+  document.getElementById('btnForm').classList.remove('active'); document.getElementById('btnAdmin').classList.add('active');
   renderTable();
 }
-
 function showTab(t) {
-  if (t === 'form') {
-    document.getElementById('tabForm').style.display = 'block';
-    document.getElementById('tabAdmin').style.display = 'none';
-    document.getElementById('btnForm').classList.add('active');
-    document.getElementById('btnAdmin').classList.remove('active');
+  if(t==='form') {
+    document.getElementById('tabForm').style.display='block'; document.getElementById('tabAdmin').style.display='none';
+    document.getElementById('btnForm').classList.add('active'); document.getElementById('btnAdmin').classList.remove('active');
   }
 }
-
 function updateProgress(s) {
-  for (let i=1;i<=6;i++) {
-    const el = document.getElementById('s'+i);
-    el.className = 'step'+(i<s?' done':i===s?' active':'');
-    el.querySelector('.step-circle').textContent = i<s?'✓':i;
-  }
+  for(let i=1;i<=6;i++){const el=document.getElementById('s'+i); el.className='step'+(i<s?' done':i===s?' active':''); el.querySelector('.step-circle').textContent=i<s?'✓':i;}
 }
-
 function validate(ids) {
-  for (const id of ids) {
-    const el = document.getElementById(id);
-    if (!el.value.trim()) { el.focus(); el.style.borderColor='#c0392b'; setTimeout(()=>el.style.borderColor='',2000); alert('נא למלא את כל השדות המסומנים ב-*'); return false; }
-  }
-  return true;
+  for(const id of ids){const el=document.getElementById(id); if(!el.value.trim()){el.focus();el.style.borderColor='#c0392b';setTimeout(()=>el.style.borderColor='',2000);alert('נא למלא את כל השדות המסומנים ב-*');return false;}} return true;
 }
-
 function goNext(s) {
-  if (s===1 && !validate(['last_name','first_name','id_num','bday_eng','address'])) return;
-  if (s===2 && !validate(['father_name','father_mobile','mother_name','mother_mobile'])) return;
-  document.getElementById('step'+s).style.display = 'none';
-  document.getElementById('step'+(s+1)).style.display = 'block';
+  if(s===1&&!validate(['last_name','first_name','id_num','bday_eng','address']))return;
+  if(s===2&&!validate(['father_name','father_mobile','mother_name','mother_mobile']))return;
+  document.getElementById('step'+s).style.display='none'; document.getElementById('step'+(s+1)).style.display='block';
   updateProgress(s+1); window.scrollTo(0,0);
 }
-
 function goBack(s) {
-  document.getElementById('step'+s).style.display = 'none';
-  document.getElementById('step'+(s-1)).style.display = 'block';
+  document.getElementById('step'+s).style.display='none'; document.getElementById('step'+(s-1)).style.display='block';
   updateProgress(s-1); window.scrollTo(0,0);
 }
-
-function toggleDiag(show) { document.getElementById('diagNote').style.display = show?'block':'none'; }
-
 function addSib() {
-  const c = document.getElementById('sibCont');
-  if (c.children.length>=6) { alert('ניתן להוסיף עד 6 אחים'); return; }
-  const d = document.createElement('div'); d.className='sibling-row';
+  const c=document.getElementById('sibCont'); if(c.children.length>=6){alert('ניתן להוסיף עד 6 אחים');return;}
+  const d=document.createElement('div'); d.className='sibling-row';
   d.innerHTML=`<div class="form-group"><label>שם</label><input type="text"></div><div class="form-group"><label>ת. לידה</label><input type="date"></div><div class="form-group"><label>מוסד חינוכי</label><input type="text"></div><div><label style="visibility:hidden;display:block;font-size:13px">x</label><button class="btn-remove" onclick="removeSib(this)">✕</button></div>`;
   c.appendChild(d);
 }
-
-function removeSib(btn) { const c=document.getElementById('sibCont'); if(c.children.length>1) btn.closest('.sibling-row').remove(); }
+function removeSib(btn){const c=document.getElementById('sibCont');if(c.children.length>1)btn.closest('.sibling-row').remove();}
 
 async function submitForm() {
-  if (!validate(['signer_name'])) return;
-  if (!hasSig) { document.getElementById('sigErr').style.display='block'; return; }
-
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'שולח...';
-  btn.disabled = true;
-
-  const data = {
-    lastName: document.getElementById('last_name').value,
-    firstName: document.getElementById('first_name').value,
-    idNum: document.getElementById('id_num').value,
-    gender: document.getElementById('gender').value,
-    bdayEng: document.getElementById('bday_eng').value,
-    bdayHeb: document.getElementById('bday_heb').value,
-    birthplace: document.getElementById('birthplace').value,
-    aliyaDate: document.getElementById('aliya_date').value,
-    address: document.getElementById('address').value,
-    homePhone: document.getElementById('home_phone').value,
-    fatherName: document.getElementById('father_name').value,
-    fatherStatus: document.getElementById('father_status').value,
-    fatherJob: document.getElementById('father_job').value,
-    fatherWorkplace: document.getElementById('father_workplace').value,
-    fatherMobile: document.getElementById('father_mobile').value,
-    fatherWorkPhone: document.getElementById('father_work_phone').value,
-    fatherEmail: document.getElementById('father_email').value,
-    motherName: document.getElementById('mother_name').value,
-    motherStatus: document.getElementById('mother_status').value,
-    motherJob: document.getElementById('mother_job').value,
-    motherWorkplace: document.getElementById('mother_workplace').value,
-    motherMobile: document.getElementById('mother_mobile').value,
-    motherWorkPhone: document.getElementById('mother_work_phone').value,
-    motherEmail: document.getElementById('mother_email').value,
-    hmo: document.getElementById('hmo').value,
-    hmoBranch: document.getElementById('hmo_branch').value,
-    emergencyName: document.getElementById('emergency_name').value,
-    emergencyPhone: document.getElementById('emergency_phone').value,
-    emergencyRel: document.getElementById('emergency_rel').value,
-    diagnosis: document.querySelector('input[name="diag"]:checked').value === 'yes',
-    medicalNotes: document.getElementById('medical_notes').value,
-    friend1: document.getElementById('friend1').value,
-    friend2: document.getElementById('friend2').value,
-    friend3: document.getElementById('friend3').value,
-    prevSchool: document.getElementById('prev_school').value,
-    extraNotes: document.getElementById('extra_notes').value,
-    conWelfare: document.getElementById('con_welfare').checked,
-    conSchool: document.getElementById('con_school').checked,
-    conHmo: document.getElementById('con_hmo').checked,
-    conPsych: document.getElementById('con_psych').checked,
-    photoConsent: document.getElementById('photo_consent').checked,
-    signerName: document.getElementById('signer_name').value,
+  if(!validate(['signer_name']))return;
+  if(!hasSig){document.getElementById('sigErr').style.display='block';return;}
+  const btn=document.getElementById('submitBtn'); btn.textContent='שולח...'; btn.disabled=true;
+  const data={
+    lastName:document.getElementById('last_name').value, firstName:document.getElementById('first_name').value,
+    idNum:document.getElementById('id_num').value, gender:document.getElementById('gender').value,
+    bdayEng:document.getElementById('bday_eng').value, bdayHeb:document.getElementById('bday_heb').value,
+    birthplace:document.getElementById('birthplace').value, aliyaDate:document.getElementById('aliya_date').value,
+    address:document.getElementById('address').value, homePhone:document.getElementById('home_phone').value,
+    fatherName:document.getElementById('father_name').value, fatherStatus:document.getElementById('father_status').value,
+    fatherJob:document.getElementById('father_job').value, fatherWorkplace:document.getElementById('father_workplace').value,
+    fatherMobile:document.getElementById('father_mobile').value, fatherWorkPhone:document.getElementById('father_work_phone').value,
+    fatherEmail:document.getElementById('father_email').value, motherName:document.getElementById('mother_name').value,
+    motherStatus:document.getElementById('mother_status').value, motherJob:document.getElementById('mother_job').value,
+    motherWorkplace:document.getElementById('mother_workplace').value, motherMobile:document.getElementById('mother_mobile').value,
+    motherWorkPhone:document.getElementById('mother_work_phone').value, motherEmail:document.getElementById('mother_email').value,
+    hmo:document.getElementById('hmo').value, hmoBranch:document.getElementById('hmo_branch').value,
+    emergencyName:document.getElementById('emergency_name').value, emergencyPhone:document.getElementById('emergency_phone').value,
+    emergencyRel:document.getElementById('emergency_rel').value,
+    diagnosis:document.querySelector('input[name="diag"]:checked').value==='yes',
+    medicalNotes:document.getElementById('medical_notes').value,
+    emotionalNotes:document.getElementById('emotional_notes').value,
+    specialEd:document.querySelector('input[name="special_ed"]:checked').value==='yes',
+    afionType:document.getElementById('afion_type').value,
+    ganSupport:document.querySelector('input[name="gan_support"]:checked').value==='yes',
+    friend1:document.getElementById('friend1').value, friend2:document.getElementById('friend2').value,
+    friend3:document.getElementById('friend3').value, prevSchool:document.getElementById('prev_school').value,
+    extraNotes:document.getElementById('extra_notes').value,
+    conWelfare:document.getElementById('con_welfare').checked, conSchool:document.getElementById('con_school').checked,
+    conHmo:document.getElementById('con_hmo').checked, conPsych:document.getElementById('con_psych').checked,
+    photoConsent:document.getElementById('photo_consent').checked, signerName:document.getElementById('signer_name').value,
   };
-
-  regs.push({
-    id: Date.now(),
-    firstName: data.firstName, lastName: data.lastName,
-    bday: data.bdayEng, fatherName: data.fatherName, motherName: data.motherName,
-    phone: data.fatherMobile || data.motherMobile,
-    diagnosis: data.diagnosis, status: 'pending'
-  });
-
-  try {
-    await fetch(SHEET_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-  } catch(e) { console.warn('שגיאה:', e); }
-
-  document.getElementById('step6').style.display = 'none';
-  document.getElementById('progressBar').style.display = 'none';
-  document.getElementById('stepSuccess').style.display = 'block';
-  document.querySelector('.tab-btns').style.display = 'none';
+  regs.push({id:Date.now(),firstName:data.firstName,lastName:data.lastName,bday:data.bdayEng,fatherName:data.fatherName,motherName:data.motherName,phone:data.fatherMobile||data.motherMobile,diagnosis:data.diagnosis,status:'pending'});
+  try { await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); } catch(e){console.warn(e);}
+  document.getElementById('step6').style.display='none'; document.getElementById('progressBar').style.display='none';
+  document.getElementById('stepSuccess').style.display='block'; document.querySelector('.tab-btns').style.display='none';
 }
 
 function resetForm() {
-  document.querySelectorAll('#tabForm input, #tabForm select, #tabForm textarea').forEach(el => {
-    if (el.type==='checkbox'||el.type==='radio') el.checked=el.defaultChecked;
-    else el.value = el.defaultValue||'';
+  document.querySelectorAll('#tabForm input, #tabForm select, #tabForm textarea').forEach(el=>{
+    if(el.type==='checkbox'||el.type==='radio') el.checked=el.defaultChecked; else el.value=el.defaultValue||'';
   });
-  document.getElementById('sign_date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('sign_date').value=new Date().toISOString().split('T')[0];
   clearSig();
-  const sib = document.getElementById('sibCont');
-  while (sib.children.length>1) sib.lastChild.remove();
+  const sib=document.getElementById('sibCont'); while(sib.children.length>1) sib.lastChild.remove();
   sib.querySelectorAll('input').forEach(i=>i.value='');
-  for (let i=1;i<=6;i++) document.getElementById('step'+i).style.display=i===1?'block':'none';
-  document.getElementById('stepSuccess').style.display='none';
-  document.getElementById('progressBar').style.display='block';
-  document.querySelector('.tab-btns').style.display='flex';
-  document.getElementById('diagNote').style.display='none';
-  document.getElementById('sigErr').style.display='none';
-  document.getElementById('submitBtn').textContent='שלח הרשמה ✓';
-  document.getElementById('submitBtn').disabled=false;
-  updateProgress(1); window.scrollTo(0,0);
+  for(let i=1;i<=6;i++) document.getElementById('step'+i).style.display=i===1?'block':'none';
+  document.getElementById('stepSuccess').style.display='none'; document.getElementById('progressBar').style.display='block';
+  document.querySelector('.tab-btns').style.display='flex'; document.getElementById('diagNote').style.display='none';
+  document.getElementById('specialEdSection').style.display='none'; document.getElementById('ganSupportFile').style.display='none';
+  document.getElementById('sigErr').style.display='none'; document.getElementById('submitBtn').textContent='שלח הרשמה ✓';
+  document.getElementById('submitBtn').disabled=false; updateProgress(1); window.scrollTo(0,0);
 }
 
-let _f='', _sf='';
-function renderTable() {
-  const filtered = regs.filter(r => {
-    const n=(r.firstName+' '+r.lastName).toLowerCase();
-    return (!_f||n.includes(_f.toLowerCase()))&&(!_sf||r.status===_sf);
-  });
-  document.getElementById('regCount').textContent = regs.length;
-  const tb = document.getElementById('regBody');
-  if (!filtered.length) { tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>'; return; }
-  tb.innerHTML = filtered.map((r,i)=>`<tr>
-    <td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td>
-    <td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td>
-    <td dir="ltr">${r.phone||'—'}</td>
-    <td>${r.diagnosis?'<span style="color:#c0392b">כן</span>':'לא'}</td>
-    <td><span class="badge ${r.status}">${r.status==='pending'?'ממתין':r.status==='approved'?'אושר':'נדחה'}</span></td>
-    <td>
-      <button onclick="setSt(${r.id},'approved')" style="background:#eafaf1;color:#1e8449;border:1px solid #a9dfbf;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px;font-family:Arial">אשר</button>
-      <button onclick="setSt(${r.id},'rejected')" style="background:#fdecea;color:#c0392b;border:1px solid #f5b7b1;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;font-family:Arial">דחה</button>
-    </td>
-  </tr>`).join('');
+let _f='',_sf='';
+function renderTable(){
+  const filtered=regs.filter(r=>{const n=(r.firstName+' '+r.lastName).toLowerCase();return(!_f||n.includes(_f.toLowerCase()))&&(!_sf||r.status===_sf);});
+  document.getElementById('regCount').textContent=regs.length;
+  const tb=document.getElementById('regBody');
+  if(!filtered.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>';return;}
+  tb.innerHTML=filtered.map((r,i)=>`<tr><td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td><td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td><td dir="ltr">${r.phone||'—'}</td><td>${r.diagnosis?'<span style="color:#c0392b">כן</span>':'לא'}</td><td><span class="badge ${r.status}">${r.status==='pending'?'ממתין':r.status==='approved'?'אושר':'נדחה'}</span></td><td><button onclick="setSt(${r.id},'approved')" style="background:#eafaf1;color:#1e8449;border:1px solid #a9dfbf;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px;font-family:Arial">אשר</button><button onclick="setSt(${r.id},'rejected')" style="background:#fdecea;color:#c0392b;border:1px solid #f5b7b1;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;font-family:Arial">דחה</button></td></tr>`).join('');
 }
-
 function setSt(id,s){const r=regs.find(r=>r.id===id);if(r)r.status=s;renderTable();}
 function filterTable(v){_f=v;renderTable();}
 function filterStatus(v){_sf=v;renderTable();}
-
-function exportCSV() {
-  if (!regs.length){alert('אין נרשמים לייצוא');return;}
+function exportCSV(){
+  if(!regs.length){alert('אין נרשמים לייצוא');return;}
   const h=['שם משפחה','שם פרטי','ת. לידה','שם האב','שם האם','טלפון','אבחון','סטטוס'];
   const rows=regs.map(r=>[r.lastName,r.firstName,r.bday,r.fatherName,r.motherName,r.phone,r.diagnosis?'כן':'לא',r.status]);
   const csv='\uFEFF'+[h,...rows].map(r=>r.join(',')).join('\n');
