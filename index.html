@@ -47,10 +47,6 @@ input[type=file]{padding:6px;font-size:13px;cursor:pointer}
 .tab-btn.active{background:#1a5276;color:#fff;border-color:#1a5276}
 .req-star{color:#c0392b}
 .field-note{font-size:11px;color:#999;margin-top:2px}
-.badge{display:inline-block;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600}
-.badge.approved{background:#eafaf1;color:#1e8449}
-.badge.pending{background:#fef9e7;color:#b7950b}
-.badge.rejected{background:#fdecea;color:#c0392b}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{background:#f8f9fa;padding:10px 12px;text-align:right;font-weight:600;color:#555;border-bottom:2px solid #eee}
 td{padding:10px 12px;border-bottom:0.5px solid #eee}
@@ -61,7 +57,6 @@ tr:hover td{background:#f8f9fa}
 #sigCanvas{display:block;touch-action:none;cursor:crosshair}
 .btn-clear{background:#fdecea;color:#c0392b;border:1px solid #f0c0bb;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;font-family:Arial,sans-serif;margin-top:8px}
 .success-card{background:#fff;border-radius:12px;border:2px solid #27ae60;padding:40px;text-align:center}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center}
 .modal-box{background:#fff;border-radius:14px;padding:32px;width:300px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25)}
 .modal-box h2{color:#1a5276;font-size:18px;margin-bottom:6px}
 .modal-box p{color:#888;font-size:13px;margin-bottom:18px}
@@ -201,7 +196,7 @@ tr:hover td{background:#f8f9fa}
         <div class="form-group full"><label>פרטים על הילד/ה (רגישות למאכלים, תרופות, בעיות רפואיות)</label><textarea id="medical_notes"></textarea></div>
         <div class="form-group full">
           <label>התמודדות או אתגר רגשי/משפחתי שתרצו לשתף בו</label>
-          <p class="field-note">כדי שנוכל להכיר טוב יותר את בנכם/בתכם ולסייע להם — לא חובה</p>
+          <p class="field-note">לא חובה</p>
           <textarea id="emotional_notes" placeholder="שתפו אותנו במה שנראה לכם רלוונטי..."></textarea>
         </div>
         <div class="form-group full">
@@ -217,7 +212,7 @@ tr:hover td{background:#f8f9fa}
         </div>
         <div class="form-group full">
           <label>מסמכים נוספים</label>
-          <p class="field-note">כל טופס או מסמך שיכול לסייע לנו להכיר טוב יותר את הילד/ה — לא חובה</p>
+          <p class="field-note">לא חובה</p>
           <input type="file" id="extra_docs" accept=".pdf,.jpg,.jpeg,.png" multiple>
         </div>
         <div class="form-group"><label>קופת חולים <span class="req-star">*</span></label><select id="hmo"><option value="">-- בחר --</option><option>מכבי</option><option>כללית</option><option>מאוחדת</option><option>לאומית</option></select></div>
@@ -299,17 +294,11 @@ tr:hover td{background:#f8f9fa}
       </div>
       <div class="search-bar">
         <input type="text" placeholder="חיפוש לפי שם..." oninput="filterTable(this.value)" style="flex:1">
-        <select onchange="filterStatus(this.value)" style="width:150px">
-          <option value="">כל הסטטוסים</option>
-          <option value="pending">ממתין</option>
-          <option value="approved">אושר</option>
-          <option value="rejected">נדחה</option>
-        </select>
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>#</th><th>שם התלמיד/ה</th><th>ת. לידה</th><th>שם האב</th><th>שם האם</th><th>טלפון</th><th>אבחון</th><th>סטטוס</th><th>פעולות</th></tr></thead>
-          <tbody id="regBody"><tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr></tbody>
+          <thead><tr><th>#</th><th>שם התלמיד/ה</th><th>ת. לידה</th><th>שם האב</th><th>שם האם</th><th>טלפון</th><th>אבחון</th><th>פעולות</th></tr></thead>
+          <tbody id="regBody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -331,35 +320,30 @@ tr:hover td{background:#f8f9fa}
 </div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzCcvk3dDTUHYIE3zN1SknChaITE121Q32zmX4Q0yUgY2CZk_41qQM1V0yKfN765I0f-Q/exec';
-const PW = 'avichi2025';
-let unlocked = false, regs = [];
-let drawing = false, hasSig = false;
-let canvas, ctx;
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzCcvk3dDTUHYIE3zN1SknChaITE121Q32zmX4Q0yUgY2CZk_41qQM1V0yKfN765I0f-Q/exec';
+const PW='avichi2025';
+let unlocked=false,regs=[];
+let drawing=false,hasSig=false;
+let canvas,ctx;
 
-window.onload = function() {
+window.onload=function(){
   updateProgress(1);
-  canvas = document.getElementById('sigCanvas');
-  ctx = canvas.getContext('2d');
-  canvas.width = canvas.parentElement.clientWidth || 600;
-  canvas.height = 150;
+  canvas=document.getElementById('sigCanvas');
+  ctx=canvas.getContext('2d');
+  canvas.width=canvas.parentElement.clientWidth||600;
+  canvas.height=150;
   bindCanvas();
-  document.getElementById('sign_date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('sign_date').value=new Date().toISOString().split('T')[0];
 };
 
-function bindCanvas() {
-  const getPos = (e) => {
-    const r = canvas.getBoundingClientRect();
-    const scaleX = canvas.width/r.width, scaleY = canvas.height/r.height;
-    const s = e.touches ? e.touches[0] : e;
-    return {x:(s.clientX-r.left)*scaleX, y:(s.clientY-r.top)*scaleY};
-  };
-  const start = (e) => {e.preventDefault();drawing=true;ctx.beginPath();const p=getPos(e);ctx.moveTo(p.x,p.y);};
-  const move = (e) => {e.preventDefault();if(!drawing)return;const p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a5276';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();hasSig=true;};
-  const stop = () => drawing=false;
-  canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move);
-  canvas.addEventListener('mouseup',stop); canvas.addEventListener('mouseleave',stop);
-  canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false});
+function bindCanvas(){
+  const getPos=(e)=>{const r=canvas.getBoundingClientRect();const scaleX=canvas.width/r.width,scaleY=canvas.height/r.height;const s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*scaleX,y:(s.clientY-r.top)*scaleY};};
+  const start=(e)=>{e.preventDefault();drawing=true;ctx.beginPath();const p=getPos(e);ctx.moveTo(p.x,p.y);};
+  const move=(e)=>{e.preventDefault();if(!drawing)return;const p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a5276';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();hasSig=true;};
+  const stop=()=>drawing=false;
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);
+  canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',move,{passive:false});
   canvas.addEventListener('touchend',stop);
 }
 
@@ -452,7 +436,7 @@ async function submitForm(){
   regs.push({
     id:Date.now(),firstName:data.firstName,lastName:data.lastName,bday:data.bdayEng,
     fatherName:data.fatherName,motherName:data.motherName,phone:data.fatherMobile||data.motherMobile,
-    diagnosis:data.diagnosis,status:'pending',
+    diagnosis:data.diagnosis,
     signerName:data.signerName,signDate:document.getElementById('sign_date').value,
     conWelfare:data.conWelfare,conSchool:data.conSchool,conHmo:data.conHmo,conPsych:data.conPsych,
     sigImage:canvas.toDataURL()
@@ -483,26 +467,10 @@ function downloadPDF(id){
   const cons=[r.conWelfare?'רווחה – עובד סוציאלי':null,r.conSchool?'מוסד לימודים קודם':null,r.conHmo?'קופת חולים':null,r.conPsych?'פסיכולוג':null].filter(Boolean);
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-<meta charset="UTF-8">
+<html lang="he" dir="rtl"><head><meta charset="UTF-8">
 <title>ויתור סודיות - ${r.lastName} ${r.firstName}</title>
-<style>
-body{font-family:Arial,sans-serif;direction:rtl;padding:50px;color:#222;max-width:700px;margin:0 auto}
-h1{font-size:20px;text-align:center;margin-bottom:4px}
-h2{font-size:15px;text-align:center;color:#555;margin-bottom:30px;font-weight:normal}
-.date{text-align:left;margin-bottom:30px;font-size:14px}
-p{font-size:14px;line-height:1.8;margin-bottom:12px}
-.child-name{font-weight:bold;font-size:15px}
-ul{margin:10px 0 16px 0;padding-right:20px}
-ul li{font-size:14px;line-height:2}
-.sig-section{margin-top:40px;border-top:1px solid #ccc;padding-top:20px}
-.sig-img{border:1px solid #ccc;border-radius:6px;max-width:300px;margin-top:8px}
-.footer{margin-top:40px;text-align:center;font-size:12px;color:#888}
-@media print{body{padding:30px}}
-</style>
-</head>
-<body>
+<style>body{font-family:Arial,sans-serif;direction:rtl;padding:50px;color:#222;max-width:700px;margin:0 auto}h1{font-size:20px;text-align:center;margin-bottom:4px}h2{font-size:15px;text-align:center;color:#555;margin-bottom:30px;font-weight:normal}.date{text-align:left;margin-bottom:30px;font-size:14px}p{font-size:14px;line-height:1.8;margin-bottom:12px}.child-name{font-weight:bold;font-size:15px}ul{margin:10px 0 16px 0;padding-right:20px}ul li{font-size:14px;line-height:2}.sig-section{margin-top:40px;border-top:1px solid #ccc;padding-top:20px}.sig-img{border:1px solid #ccc;border-radius:6px;max-width:300px;margin-top:8px}.footer{margin-top:40px;text-align:center;font-size:12px;color:#888}@media print{body{padding:30px}}</style>
+</head><body>
 <h1>בית חינוך ממ"ד אביחי</h1>
 <h2>טופס ויתור סודיות</h2>
 <div class="date">תאריך: ${r.signDate||new Date().toLocaleDateString('he-IL')}</div>
@@ -520,32 +488,25 @@ ${r.sigImage?`<img src="${r.sigImage}" class="sig-img">`:'<p>אין חתימה</
   w.document.close();
 }
 
-let _f='',_sf='';
+let _f='';
 function renderTable(){
-  const filtered=regs.filter(r=>{const n=(r.firstName+' '+r.lastName).toLowerCase();return(!_f||n.includes(_f.toLowerCase()))&&(!_sf||r.status===_sf);});
+  const filtered=regs.filter(r=>{const n=(r.firstName+' '+r.lastName).toLowerCase();return !_f||n.includes(_f.toLowerCase());});
   document.getElementById('regCount').textContent=regs.length;
   const tb=document.getElementById('regBody');
-  if(!filtered.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>';return;}
+  if(!filtered.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>';return;}
   tb.innerHTML=filtered.map((r,i)=>`<tr>
     <td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td>
     <td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td>
     <td dir="ltr">${r.phone||'—'}</td>
     <td>${r.diagnosis?'<span style="color:#c0392b">כן</span>':'לא'}</td>
-    <td><span class="badge ${r.status}">${r.status==='pending'?'ממתין':r.status==='approved'?'אושר':'נדחה'}</span></td>
-    <td>
-      <button onclick="setSt(${r.id},'approved')" style="background:#eafaf1;color:#1e8449;border:1px solid #a9dfbf;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px;font-family:Arial">אשר</button>
-      <button onclick="setSt(${r.id},'rejected')" style="background:#fdecea;color:#c0392b;border:1px solid #f5b7b1;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px;font-family:Arial">דחה</button>
-      <button onclick="downloadPDF(${r.id})" style="background:#e8f0f8;color:#1a5276;border:1px solid #aac4e0;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;font-family:Arial">📄 PDF</button>
-    </td>
+    <td><button onclick="downloadPDF(${r.id})" style="background:#e8f0f8;color:#1a5276;border:1px solid #aac4e0;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:Arial">📄 הורד PDF</button></td>
   </tr>`).join('');
 }
-function setSt(id,s){const r=regs.find(r=>r.id===id);if(r)r.status=s;renderTable();}
 function filterTable(v){_f=v;renderTable();}
-function filterStatus(v){_sf=v;renderTable();}
 function exportCSV(){
   if(!regs.length){alert('אין נרשמים לייצוא');return;}
-  const h=['שם משפחה','שם פרטי','ת. לידה','שם האב','שם האם','טלפון','אבחון','סטטוס'];
-  const rows=regs.map(r=>[r.lastName,r.firstName,r.bday,r.fatherName,r.motherName,r.phone,r.diagnosis?'כן':'לא',r.status]);
+  const h=['שם משפחה','שם פרטי','ת. לידה','שם האב','שם האם','טלפון','אבחון'];
+  const rows=regs.map(r=>[r.lastName,r.firstName,r.bday,r.fatherName,r.motherName,r.phone,r.diagnosis?'כן':'לא']);
   const csv='\uFEFF'+[h,...rows].map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='רשימת_נרשמים.csv';a.click();
 }
