@@ -415,12 +415,14 @@ async function submitForm(){
   document.getElementById('photoErr').style.display=photoChecked?'none':'block';
 
   // בדיקת שם חותם
-  if(!validate(['signer_name']))return;
+  const signerEl=document.getElementById('signer_name');
+  const signerOk=signerEl.value.trim()!=='';
+  if(!signerOk){signerEl.focus();signerEl.style.borderColor='#c0392b';setTimeout(()=>signerEl.style.borderColor='',2000);}
 
   // בדיקת חתימה
   document.getElementById('sigErr').style.display=hasSig?'none':'block';
 
-  if(!conChecked||!photoChecked||!hasSig)return;
+  if(!conChecked||!photoChecked||!signerOk||!hasSig)return;
 
   const btn=document.getElementById('submitBtn');btn.textContent='שולח...';btn.disabled=true;
   const data={
