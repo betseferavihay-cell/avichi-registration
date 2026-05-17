@@ -257,10 +257,11 @@ tr:hover td{background:#f8f9fa}
       <div style="background:#f8f9fa;border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px;line-height:1.7;color:#444">
         <strong>אישור צילום:</strong> הריני מאשר/ת לבני/בתי להצטלם במסגרת בית הספר ולפרסם באתר ובכלל.
       </div>
-      <div class="checkbox-group" style="margin-bottom:8px">
-        <label><input type="checkbox" id="photo_consent"> אני מאשר/ת את פרסום תמונות ילדי/ילדתי <span class="req-star">*</span></label>
+      <div class="radio-group" style="margin-bottom:8px">
+        <label><input type="radio" name="photo" value="yes"> כן, אני מאשר/ת</label>
+        <label><input type="radio" name="photo" value="no"> לא, אני לא מאשר/ת</label>
       </div>
-      <div id="photoErr" class="err" style="margin-bottom:16px">יש לאשר את פרסום התמונות</div>
+      <div id="photoErr" class="err" style="margin-bottom:16px">יש לבחור אחת מהאפשרויות</div>
 
       <div class="form-grid" style="margin-bottom:20px">
         <div class="form-group"><label>שם ההורה החותם <span class="req-star">*</span></label><input type="text" id="signer_name"></div>
@@ -411,8 +412,8 @@ async function submitForm(){
   document.getElementById('conErr').style.display=conChecked?'none':'block';
 
   // בדיקת אישור צילום
-  const photoChecked=document.getElementById('photo_consent').checked;
-  document.getElementById('photoErr').style.display=photoChecked?'none':'block';
+  const photoEl=document.querySelector('input[name="photo"]:checked');
+  document.getElementById('photoErr').style.display=photoEl?'none':'block';
 
   // בדיקת שם חותם
   const signerEl=document.getElementById('signer_name');
@@ -422,7 +423,7 @@ async function submitForm(){
   // בדיקת חתימה
   document.getElementById('sigErr').style.display=hasSig?'none':'block';
 
-  if(!conChecked||!photoChecked||!signerOk||!hasSig)return;
+  if(!conChecked||!photoEl||!signerOk||!hasSig)return;
 
   const btn=document.getElementById('submitBtn');btn.textContent='שולח...';btn.disabled=true;
   const data={
