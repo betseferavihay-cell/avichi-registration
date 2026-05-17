@@ -255,7 +255,7 @@ tr:hover td{background:#f8f9fa}
       <div id="conErr" class="err" style="margin-bottom:16px">יש לסמן לפחות גורם אחד לויתור סודיות</div>
 
       <div style="background:#f8f9fa;border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px;line-height:1.7;color:#444">
-        <strong>אישור צילום:</strong> הריני מאשר/ת לבני/בתי להצטלם במסגרת בית הספר ולפרסם באתר ובכלל.
+        <strong>אישור צילום <span class="req-star">*</span>:</strong> הריני מאשר/ת לבני/בתי להצטלם במסגרת בית הספר ולפרסם באתר ובכלל.
       </div>
       <div class="radio-group" style="margin-bottom:8px">
         <label><input type="radio" name="photo" value="yes"> כן, אני מאשר/ת</label>
@@ -304,7 +304,7 @@ tr:hover td{background:#f8f9fa}
       <div style="overflow-x:auto">
         <table>
           <thead><tr><th>#</th><th>שם התלמיד/ה</th><th>ת. לידה</th><th>שם האב</th><th>שם האם</th><th>טלפון</th><th>אבחון</th><th>פעולות</th></tr></thead>
-          <tbody id="regBody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr></tbody>
+          <tbody id="regBody"><tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">טוען נתונים...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -371,6 +371,7 @@ function checkPw(){
   else{document.getElementById('pwErr').style.display='block';document.getElementById('pwInput').value='';}
 }
 function closeModal(){document.getElementById('modal').style.display='none';}
+
 function showAdmin(){
   document.getElementById('tabForm').style.display='none';document.getElementById('tabAdmin').style.display='block';
   document.getElementById('btnForm').classList.remove('active');document.getElementById('btnAdmin').classList.add('active');
@@ -379,33 +380,32 @@ function showAdmin(){
 
 async function loadFromSheet(){
   document.getElementById('regBody').innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">טוען נתונים...</td></tr>';
-  try {
-    const res = await fetch(SHEET_URL);
-    const json = await res.json();
-    if(json.success && json.data.length){
-      regs = json.data.map((r,i) => ({
-        id: i,
-        firstName: r['שם פרטי']||'',
-        lastName: r['שם משפחה']||'',
-        bday: r['ת. לידה לועזי']||'',
-        fatherName: r['שם האב']||'',
-        motherName: r['שם האם']||'',
-        phone: r['נייד אב']||r['נייד אם']||'',
-        diagnosis: r['אבחון']==='כן',
-        signerName: r['שם חותם']||'',
-        signDate: r['תאריך חתימה']||'',
-        conWelfare: r['ויתור רווחה']==='✓',
-        conSchool: r['ויתור מוסד']==='✓',
-        conHmo: r['ויתור קופ"ח']==='✓',
-        conPsych: r['ויתור פסיכולוג']==='✓',
-        sigImage: r['חתימה (base64)']||''
+  try{
+    const res=await fetch(SHEET_URL+'?t='+Date.now());
+    const json=await res.json();
+    if(json.success&&json.data.length){
+      regs=json.data.map((r,i)=>({
+        id:i,
+        firstName:r['שם פרטי']||'',
+        lastName:r['שם משפחה']||'',
+        bday:r['ת. לידה לועזי']||'',
+        fatherName:r['שם האב']||'',
+        motherName:r['שם האם']||'',
+        phone:r['נייד אב']||r['נייד אם']||'',
+        diagnosis:r['אבחון']==='כן',
+        signerName:r['שם חותם']||'',
+        signDate:r['תאריך חתימה']||'',
+        conWelfare:r['ויתור רווחה']==='✓',
+        conSchool:r['ויתור מוסד']==='✓',
+        conHmo:r['ויתור קופ"ח']==='✓',
+        conPsych:r['ויתור פסיכולוג']==='✓',
+        sigImage:r['חתימה (base64)']||''
       }));
-    }
-  } catch(e) {
-    console.warn('שגיאה בטעינה:', e);
-  }
+    } else { regs=[]; }
+  }catch(e){console.warn('שגיאה:',e);regs=[];}
   renderTable();
 }
+
 function showTab(t){
   if(t==='form'){
     document.getElementById('tabForm').style.display='block';document.getElementById('tabAdmin').style.display='none';
@@ -437,40 +437,49 @@ function addSib(){
 function removeSib(btn){const c=document.getElementById('sibCont');if(c.children.length>1)btn.closest('.sibling-row').remove();}
 
 async function submitForm(){
-  // בדיקת ויתור סודיות
   const conChecked=document.getElementById('con_welfare').checked||document.getElementById('con_school').checked||document.getElementById('con_hmo').checked||document.getElementById('con_psych').checked;
   document.getElementById('conErr').style.display=conChecked?'none':'block';
-
-  // בדיקת אישור צילום
   const photoEl=document.querySelector('input[name="photo"]:checked');
   document.getElementById('photoErr').style.display=photoEl?'none':'block';
-
-  // בדיקת שם חותם
   const signerEl=document.getElementById('signer_name');
   const signerOk=signerEl.value.trim()!=='';
   if(!signerOk){signerEl.focus();signerEl.style.borderColor='#c0392b';setTimeout(()=>signerEl.style.borderColor='',2000);}
-
-  // בדיקת חתימה
   document.getElementById('sigErr').style.display=hasSig?'none':'block';
-
   if(!conChecked||!photoEl||!signerOk||!hasSig)return;
 
   const btn=document.getElementById('submitBtn');btn.textContent='שולח...';btn.disabled=true;
+
+  const sigData=canvas.toDataURL('image/png');
+
   const data={
-    lastName:document.getElementById('last_name').value,firstName:document.getElementById('first_name').value,
-    idNum:document.getElementById('id_num').value,gender:document.getElementById('gender').value,
-    bdayEng:document.getElementById('bday_eng').value,bdayHeb:document.getElementById('bday_heb').value,
-    birthplace:document.getElementById('birthplace').value,aliyaDate:document.getElementById('aliya_date').value,
-    address:document.getElementById('address').value,homePhone:document.getElementById('home_phone').value,
-    fatherName:document.getElementById('father_name').value,fatherStatus:document.getElementById('father_status').value,
-    fatherJob:document.getElementById('father_job').value,fatherWorkplace:document.getElementById('father_workplace').value,
-    fatherMobile:document.getElementById('father_mobile').value,fatherWorkPhone:document.getElementById('father_work_phone').value,
-    fatherEmail:document.getElementById('father_email').value,motherName:document.getElementById('mother_name').value,
-    motherStatus:document.getElementById('mother_status').value,motherJob:document.getElementById('mother_job').value,
-    motherWorkplace:document.getElementById('mother_workplace').value,motherMobile:document.getElementById('mother_mobile').value,
-    motherWorkPhone:document.getElementById('mother_work_phone').value,motherEmail:document.getElementById('mother_email').value,
-    hmo:document.getElementById('hmo').value,hmoBranch:document.getElementById('hmo_branch').value,
-    emergencyName:document.getElementById('emergency_name').value,emergencyPhone:document.getElementById('emergency_phone').value,
+    lastName:document.getElementById('last_name').value,
+    firstName:document.getElementById('first_name').value,
+    idNum:document.getElementById('id_num').value,
+    gender:document.getElementById('gender').value,
+    bdayEng:document.getElementById('bday_eng').value,
+    bdayHeb:document.getElementById('bday_heb').value,
+    birthplace:document.getElementById('birthplace').value,
+    aliyaDate:document.getElementById('aliya_date').value,
+    address:document.getElementById('address').value,
+    homePhone:document.getElementById('home_phone').value,
+    fatherName:document.getElementById('father_name').value,
+    fatherStatus:document.getElementById('father_status').value,
+    fatherJob:document.getElementById('father_job').value,
+    fatherWorkplace:document.getElementById('father_workplace').value,
+    fatherMobile:document.getElementById('father_mobile').value,
+    fatherWorkPhone:document.getElementById('father_work_phone').value,
+    fatherEmail:document.getElementById('father_email').value,
+    motherName:document.getElementById('mother_name').value,
+    motherStatus:document.getElementById('mother_status').value,
+    motherJob:document.getElementById('mother_job').value,
+    motherWorkplace:document.getElementById('mother_workplace').value,
+    motherMobile:document.getElementById('mother_mobile').value,
+    motherWorkPhone:document.getElementById('mother_work_phone').value,
+    motherEmail:document.getElementById('mother_email').value,
+    hmo:document.getElementById('hmo').value,
+    hmoBranch:document.getElementById('hmo_branch').value,
+    emergencyName:document.getElementById('emergency_name').value,
+    emergencyPhone:document.getElementById('emergency_phone').value,
     emergencyRel:document.getElementById('emergency_rel').value,
     diagnosis:document.querySelector('input[name="diag"]:checked').value==='yes',
     medicalNotes:document.getElementById('medical_notes').value,
@@ -478,23 +487,29 @@ async function submitForm(){
     specialEd:document.querySelector('input[name="special_ed"]:checked').value==='yes',
     afionType:document.getElementById('afion_type').value,
     ganSupport:document.querySelector('input[name="gan_support"]:checked').value==='yes',
-    friend1:document.getElementById('friend1').value,friend2:document.getElementById('friend2').value,
-    friend3:document.getElementById('friend3').value,prevSchool:document.getElementById('prev_school').value,
+    friend1:document.getElementById('friend1').value,
+    friend2:document.getElementById('friend2').value,
+    friend3:document.getElementById('friend3').value,
+    prevSchool:document.getElementById('prev_school').value,
     extraNotes:document.getElementById('extra_notes').value,
-    conWelfare:document.getElementById('con_welfare').checked,conSchool:document.getElementById('con_school').checked,
-    conHmo:document.getElementById('con_hmo').checked,conPsych:document.getElementById('con_psych').checked,
-    photoConsent:true,signerName:document.getElementById('signer_name').value,
+    conWelfare:document.getElementById('con_welfare').checked,
+    conSchool:document.getElementById('con_school').checked,
+    conHmo:document.getElementById('con_hmo').checked,
+    conPsych:document.getElementById('con_psych').checked,
+    photoConsent:photoEl.value,
+    signerName:document.getElementById('signer_name').value,
+    signDate:document.getElementById('sign_date').value,
+    sigImage:sigData
   };
-  regs.push({
-    id:Date.now(),firstName:data.firstName,lastName:data.lastName,bday:data.bdayEng,
-    fatherName:data.fatherName,motherName:data.motherName,phone:data.fatherMobile||data.motherMobile,
-    diagnosis:data.diagnosis,signerName:data.signerName,signDate:document.getElementById('sign_date').value,
-    conWelfare:data.conWelfare,conSchool:data.conSchool,conHmo:data.conHmo,conPsych:data.conPsych,
-    sigImage:canvas.toDataURL()
-  });
-  try{await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});}catch(e){console.warn(e);}
-  document.getElementById('step6').style.display='none';document.getElementById('progressBar').style.display='none';
-  document.getElementById('stepSuccess').style.display='block';document.querySelector('.tab-btns').style.display='none';
+
+  try{
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }catch(e){console.warn(e);}
+
+  document.getElementById('step6').style.display='none';
+  document.getElementById('progressBar').style.display='none';
+  document.getElementById('stepSuccess').style.display='block';
+  document.querySelector('.tab-btns').style.display='none';
 }
 
 function resetForm(){
@@ -506,10 +521,12 @@ function resetForm(){
   const sib=document.getElementById('sibCont');while(sib.children.length>1)sib.lastChild.remove();
   sib.querySelectorAll('input').forEach(i=>i.value='');
   for(let i=1;i<=6;i++) document.getElementById('step'+i).style.display=i===1?'block':'none';
-  document.getElementById('stepSuccess').style.display='none';document.getElementById('progressBar').style.display='block';
+  document.getElementById('stepSuccess').style.display='none';
+  document.getElementById('progressBar').style.display='block';
   document.querySelector('.tab-btns').style.display='flex';
   ['diagNote','specialEdSection','ganSupportFile','afionSection','afionDiagFile','sigErr','conErr','photoErr'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('submitBtn').textContent='שלח הרשמה ✓';document.getElementById('submitBtn').disabled=false;
+  document.getElementById('submitBtn').textContent='שלח הרשמה ✓';
+  document.getElementById('submitBtn').disabled=false;
   updateProgress(1);window.scrollTo(0,0);
 }
 
@@ -517,10 +534,12 @@ function downloadPDF(id){
   const r=regs.find(r=>r.id===id);if(!r)return;
   const cons=[r.conWelfare?'רווחה – עובד סוציאלי':null,r.conSchool?'מוסד לימודים קודם':null,r.conHmo?'קופת חולים':null,r.conPsych?'פסיכולוג':null].filter(Boolean);
   const w=window.open('','_blank');
-  w.document.write(`<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>ויתור סודיות - ${r.lastName} ${r.firstName}</title>
+  w.document.write(`<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8">
+<title>ויתור סודיות - ${r.lastName} ${r.firstName}</title>
 <style>body{font-family:Arial,sans-serif;direction:rtl;padding:50px;color:#222;max-width:700px;margin:0 auto}h1{font-size:20px;text-align:center;margin-bottom:4px}h2{font-size:15px;text-align:center;color:#555;margin-bottom:30px;font-weight:normal}.date{text-align:left;margin-bottom:30px;font-size:14px}p{font-size:14px;line-height:1.8;margin-bottom:12px}.child-name{font-weight:bold;font-size:15px}ul{margin:10px 0 16px 0;padding-right:20px}ul li{font-size:14px;line-height:2}.sig-section{margin-top:40px;border-top:1px solid #ccc;padding-top:20px}.sig-img{border:1px solid #ccc;border-radius:6px;max-width:300px;margin-top:8px}.footer{margin-top:40px;text-align:center;font-size:12px;color:#888}@media print{body{padding:30px}}</style>
 </head><body>
-<h1>בית חינוך ממ"ד אביחי</h1><h2>טופס ויתור סודיות</h2>
+<h1>בית חינוך ממ"ד אביחי</h1>
+<h2>טופס ויתור סודיות</h2>
 <div class="date">תאריך: ${r.signDate||new Date().toLocaleDateString('he-IL')}</div>
 <p>אנו ההורים של: <span class="child-name">${r.lastName} ${r.firstName}</span></p>
 <p>מאשרים בחתימתנו ליועצת בית הספר לקבל ולהעביר כל מידע הרלוונטי לבנינו/בתנו מהמוסדות הבאים:</p>
@@ -543,8 +562,11 @@ function renderTable(){
   const tb=document.getElementById('regBody');
   if(!filtered.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>';return;}
   tb.innerHTML=filtered.map((r,i)=>`<tr>
-    <td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td>
-    <td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td>
+    <td>${i+1}</td>
+    <td style="font-weight:500">${r.lastName} ${r.firstName}</td>
+    <td>${r.bday||'—'}</td>
+    <td>${r.fatherName||'—'}</td>
+    <td>${r.motherName||'—'}</td>
     <td dir="ltr">${r.phone||'—'}</td>
     <td>${r.diagnosis?'<span style="color:#c0392b">כן</span>':'לא'}</td>
     <td><button onclick="downloadPDF(${r.id})" style="background:#e8f0f8;color:#1a5276;border:1px solid #aac4e0;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:Arial">📄 הורד PDF</button></td>
