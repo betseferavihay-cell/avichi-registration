@@ -374,6 +374,36 @@ function closeModal(){document.getElementById('modal').style.display='none';}
 function showAdmin(){
   document.getElementById('tabForm').style.display='none';document.getElementById('tabAdmin').style.display='block';
   document.getElementById('btnForm').classList.remove('active');document.getElementById('btnAdmin').classList.add('active');
+  loadFromSheet();
+}
+
+async function loadFromSheet(){
+  document.getElementById('regBody').innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">טוען נתונים...</td></tr>';
+  try {
+    const res = await fetch(SHEET_URL);
+    const json = await res.json();
+    if(json.success && json.data.length){
+      regs = json.data.map((r,i) => ({
+        id: i,
+        firstName: r['שם פרטי']||'',
+        lastName: r['שם משפחה']||'',
+        bday: r['ת. לידה לועזי']||'',
+        fatherName: r['שם האב']||'',
+        motherName: r['שם האם']||'',
+        phone: r['נייד אב']||r['נייד אם']||'',
+        diagnosis: r['אבחון']==='כן',
+        signerName: r['שם חותם']||'',
+        signDate: r['תאריך חתימה']||'',
+        conWelfare: r['ויתור רווחה']==='✓',
+        conSchool: r['ויתור מוסד']==='✓',
+        conHmo: r['ויתור קופ"ח']==='✓',
+        conPsych: r['ויתור פסיכולוג']==='✓',
+        sigImage: r['חתימה (base64)']||''
+      }));
+    }
+  } catch(e) {
+    console.warn('שגיאה בטעינה:', e);
+  }
   renderTable();
 }
 function showTab(t){
