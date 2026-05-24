@@ -449,6 +449,23 @@ async function submitForm(){
 
   const btn=document.getElementById('submitBtn');btn.textContent='שולח...';btn.disabled=true;
 
+  // המרת קבצים ל-base64
+  async function fileToBase64(input) {
+    const file = input.files[0];
+    if (!file) return '';
+    return new Promise(res => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.readAsDataURL(file);
+    });
+  }
+
+  const diagFile      = await fileToBase64(document.getElementById('diag_file'));
+  const committeeFile = await fileToBase64(document.getElementById('committee_file'));
+  const afionDiagFile = await fileToBase64(document.getElementById('afion_diag_file'));
+  const ganSupportFile= await fileToBase64(document.getElementById('gan_support_file'));
+  const extraDocsFile = await fileToBase64(document.getElementById('extra_docs'));
+
   const sigData=canvas.toDataURL('image/png');
 
   const data={
@@ -499,7 +516,12 @@ async function submitForm(){
     photoConsent:photoEl.value,
     signerName:document.getElementById('signer_name').value,
     signDate:document.getElementById('sign_date').value,
-    sigImage:sigData
+    sigImage:sigData,
+    diagFile:diagFile,
+    committeeFile:committeeFile,
+    afionDiagFile:afionDiagFile,
+    ganSupportFile:ganSupportFile,
+    extraDocsFile:extraDocsFile
   };
 
   try{
