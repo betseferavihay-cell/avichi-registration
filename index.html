@@ -471,7 +471,7 @@ async function submitForm(){
   const ganSupportFile= await fileToBase64(document.getElementById('gan_support_file'));
   const extraDocsFile = await fileToBase64(document.getElementById('extra_docs'));
 
-  const sigData=canvas.toDataURL('image/png');
+  const sigData = canvas.toDataURL('image/jpeg', 0.5);
 
   const data={
     lastName:document.getElementById('last_name').value,
