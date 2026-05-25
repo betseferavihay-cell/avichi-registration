@@ -29,7 +29,6 @@ label{font-size:13px;color:#555;font-weight:500}
 input,select,textarea{border:1px solid #ccc;border-radius:8px;padding:9px 11px;font-size:14px;font-family:Arial,sans-serif;width:100%;direction:rtl;transition:.2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#1a5276;box-shadow:0 0 0 3px rgba(26,82,118,.1)}
 textarea{resize:vertical;min-height:80px}
-input[type=file]{padding:6px;font-size:13px;cursor:pointer}
 .sibling-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
 .btn-add{background:#e8f0f8;color:#1a5276;border:1px dashed #1a5276;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;width:100%;margin-top:4px;font-family:Arial,sans-serif}
 .btn-remove{background:#fdecea;color:#c0392b;border:1px solid #f0c0bb;border-radius:6px;padding:8px 10px;cursor:pointer;font-size:13px;font-family:Arial,sans-serif}
@@ -64,6 +63,7 @@ tr:hover td{background:#f8f9fa}
 .pw-row input{text-align:center;letter-spacing:3px;font-size:16px;padding-left:38px}
 .pw-eye{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:0}
 .err{color:#c0392b;font-size:12px;margin-top:4px;display:none}
+.mail-note{background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c;margin-top:6px}
 </style>
 </head>
 <body>
@@ -172,15 +172,11 @@ tr:hover td{background:#f8f9fa}
               <input type="text" id="afion_type" placeholder="פרטי האפיון">
             </div>
             <div class="form-group full" id="afionDiagFile" style="display:none">
-              <div style="background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c">
-                📎 יש לשלוח את קובץ האבחון במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה
-              </div>
+              <div class="mail-note">📎 יש לשלוח את האבחון במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה</div>
             </div>
             <div class="form-group full">
               <label>צירוף החלטת הוועדה</label>
-              <div style="background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c">
-                📎 יש לשלוח את החלטת הוועדה במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה
-              </div>
+              <div class="mail-note">📎 יש לשלוח את החלטת הוועדה במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה</div>
             </div>
           </div>
         </div>
@@ -192,9 +188,7 @@ tr:hover td{background:#f8f9fa}
           </div>
         </div>
         <div class="form-group full" id="diagNote" style="display:none">
-          <div style="background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c">
-            📎 יש לשלוח את קובץ האבחון במייל לכתובת בית הספר בצירוף שם הילד/ה
-          </div>
+          <div class="mail-note">📎 יש לשלוח את האבחון במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה</div>
         </div>
         <div class="form-group full"><label>פרטים על הילד/ה (רגישות למאכלים, תרופות, בעיות רפואיות)</label><textarea id="medical_notes"></textarea></div>
         <div class="form-group full">
@@ -210,16 +204,12 @@ tr:hover td{background:#f8f9fa}
           </div>
         </div>
         <div class="form-group full" id="ganSupportFile" style="display:none">
-          <div style="background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c">
-            📎 יש לשלוח את המסמכים הרלוונטיים במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה
-          </div>
+          <div class="mail-note">📎 יש לשלוח את המסמכים הרלוונטיים במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה</div>
         </div>
         <div class="form-group full">
           <label>מסמכים נוספים</label>
           <p class="field-note">לא חובה</p>
-          <div style="background:#fff8e1;border-radius:8px;padding:12px;font-size:13px;color:#856404;border:1px solid #ffe69c">
-            📎 יש לשלוח כל מסמך נוסף במייל לכתובת בית הספר בצירוף שם הילד/ה
-          </div>
+          <div class="mail-note">📎 יש לשלוח כל מסמך נוסף במייל לכתובת <a href="mailto:betseferavihay@gmail.com">betseferavihay@gmail.com</a> בצירוף שם הילד/ה</div>
         </div>
         <div class="form-group"><label>קופת חולים <span class="req-star">*</span></label><select id="hmo"><option value="">-- בחר --</option><option>מכבי</option><option>כללית</option><option>מאוחדת</option><option>לאומית</option></select></div>
         <div class="form-group"><label>סניף</label><input type="text" id="hmo_branch"></div>
@@ -258,7 +248,6 @@ tr:hover td{background:#f8f9fa}
         <label><input type="checkbox" id="con_psych"> פסיכולוג</label>
       </div>
       <div id="conErr" class="err" style="margin-bottom:16px">יש לסמן לפחות גורם אחד לויתור סודיות</div>
-
       <div style="background:#f8f9fa;border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px;line-height:1.7;color:#444">
         <strong>אישור צילום <span class="req-star">*</span>:</strong> הריני מאשר/ת לבני/בתי להצטלם במסגרת בית הספר ולפרסם באתר ובכלל.
       </div>
@@ -267,7 +256,6 @@ tr:hover td{background:#f8f9fa}
         <label><input type="radio" name="photo" value="no"> לא, אני לא מאשר/ת</label>
       </div>
       <div id="photoErr" class="err" style="margin-bottom:16px">יש לבחור אחת מהאפשרויות</div>
-
       <div class="form-grid" style="margin-bottom:20px">
         <div class="form-group"><label>שם ההורה החותם <span class="req-star">*</span></label><input type="text" id="signer_name"></div>
         <div class="form-group"><label>תאריך</label><input type="date" id="sign_date"></div>
@@ -393,7 +381,7 @@ async function loadFromSheet(){
         id:i,
         firstName:r['שם פרטי']||'',
         lastName:r['שם משפחה']||'',
-        bday:r['ת. לידה לועזי']||'',
+        bday:formatDate(r['ת. לידה לועזי']),
         fatherName:r['שם האב']||'',
         motherName:r['שם האם']||'',
         phone:r['נייד אב']||r['נייד אם']||'',
@@ -409,6 +397,11 @@ async function loadFromSheet(){
     } else { regs=[]; }
   }catch(e){console.warn('שגיאה:',e);regs=[];}
   renderTable();
+}
+
+function formatDate(d){
+  if(!d) return '';
+  try{const date=new Date(d);if(isNaN(date))return d;return date.toLocaleDateString('he-IL');}catch(e){return d;}
 }
 
 function showTab(t){
@@ -453,25 +446,6 @@ async function submitForm(){
   if(!conChecked||!photoEl||!signerOk||!hasSig)return;
 
   const btn=document.getElementById('submitBtn');btn.textContent='שולח...';btn.disabled=true;
-
-  // המרת קבצים ל-base64
-  async function fileToBase64(input) {
-    const file = input.files[0];
-    if (!file) return '';
-    return new Promise(res => {
-      const r = new FileReader();
-      r.onload = e => res(e.target.result);
-      r.readAsDataURL(file);
-    });
-  }
-
-  const diagFile      = await fileToBase64(document.getElementById('diag_file'));
-  const committeeFile = await fileToBase64(document.getElementById('committee_file'));
-  const afionDiagFile = await fileToBase64(document.getElementById('afion_diag_file'));
-  const ganSupportFile= await fileToBase64(document.getElementById('gan_support_file'));
-  const extraDocsFile = await fileToBase64(document.getElementById('extra_docs'));
-
-  const sigData = canvas.toDataURL('image/jpeg', 0.3);
 
   const data={
     lastName:document.getElementById('last_name').value,
@@ -521,12 +495,7 @@ async function submitForm(){
     photoConsent:photoEl.value,
     signerName:document.getElementById('signer_name').value,
     signDate:document.getElementById('sign_date').value,
-    sigImage:sigData,
-    diagFile:diagFile,
-    committeeFile:committeeFile,
-    afionDiagFile:afionDiagFile,
-    ganSupportFile:ganSupportFile,
-    extraDocsFile:extraDocsFile
+    sigImage:canvas.toDataURL('image/jpeg',0.4)
   };
 
   try{
@@ -565,8 +534,7 @@ function downloadPDF(id){
 <title>ויתור סודיות - ${r.lastName} ${r.firstName}</title>
 <style>body{font-family:Arial,sans-serif;direction:rtl;padding:50px;color:#222;max-width:700px;margin:0 auto}h1{font-size:20px;text-align:center;margin-bottom:4px}h2{font-size:15px;text-align:center;color:#555;margin-bottom:30px;font-weight:normal}.date{text-align:left;margin-bottom:30px;font-size:14px}p{font-size:14px;line-height:1.8;margin-bottom:12px}.child-name{font-weight:bold;font-size:15px}ul{margin:10px 0 16px 0;padding-right:20px}ul li{font-size:14px;line-height:2}.sig-section{margin-top:40px;border-top:1px solid #ccc;padding-top:20px}.sig-img{border:1px solid #ccc;border-radius:6px;max-width:300px;margin-top:8px}.footer{margin-top:40px;text-align:center;font-size:12px;color:#888}@media print{body{padding:30px}}</style>
 </head><body>
-<h1>בית חינוך ממ"ד אביחי</h1>
-<h2>טופס ויתור סודיות</h2>
+<h1>בית חינוך ממ"ד אביחי</h1><h2>טופס ויתור סודיות</h2>
 <div class="date">תאריך: ${r.signDate||new Date().toLocaleDateString('he-IL')}</div>
 <p>אנו ההורים של: <span class="child-name">${r.lastName} ${r.firstName}</span></p>
 <p>מאשרים בחתימתנו ליועצת בית הספר לקבל ולהעביר כל מידע הרלוונטי לבנינו/בתנו מהמוסדות הבאים:</p>
@@ -589,11 +557,8 @@ function renderTable(){
   const tb=document.getElementById('regBody');
   if(!filtered.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">אין נרשמים עדיין</td></tr>';return;}
   tb.innerHTML=filtered.map((r,i)=>`<tr>
-    <td>${i+1}</td>
-    <td style="font-weight:500">${r.lastName} ${r.firstName}</td>
-    <td>${r.bday||'—'}</td>
-    <td>${r.fatherName||'—'}</td>
-    <td>${r.motherName||'—'}</td>
+    <td>${i+1}</td><td style="font-weight:500">${r.lastName} ${r.firstName}</td>
+    <td>${r.bday||'—'}</td><td>${r.fatherName||'—'}</td><td>${r.motherName||'—'}</td>
     <td dir="ltr">${r.phone||'—'}</td>
     <td>${r.diagnosis?'<span style="color:#c0392b">כן</span>':'לא'}</td>
     <td><button onclick="downloadPDF(${r.id})" style="background:#e8f0f8;color:#1a5276;border:1px solid #aac4e0;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:Arial">📄 הורד PDF</button></td>
